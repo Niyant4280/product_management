@@ -14,6 +14,30 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 def index():
     return send_from_directory(basedir, 'index.html')
 
+@app.route('/firebase-config.js')
+def firebase_config():
+    api_key = os.getenv("GOOGLE_API_KEY")
+    project_id = os.getenv("PROJECT_ID")
+    
+    config_content = f"""
+const firebaseConfig = {{
+    apiKey: "{api_key}",
+    authDomain: "{project_id}.firebaseapp.com",
+    projectId: "{project_id}",
+    storageBucket: "{project_id}.firebasestorage.app",
+    messagingSenderId: "17978104214",
+    appId: "1:17978104214:web:efeb529844156dee5ae5b7",
+    measurementId: "G-EWW793K897"
+}};
+
+firebase.initializeApp(firebaseConfig);
+
+// Initialize Firebase Services
+const auth = firebase.auth();
+const db = firebase.firestore();
+"""
+    return config_content, 200, {'Content-Type': 'application/javascript'}
+
 @app.route('/<path:path>')
 def serve_static(path):
     # Security check: prevent traversing up directories
