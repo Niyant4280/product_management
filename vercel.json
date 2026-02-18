@@ -14,6 +14,10 @@
             }
         },
         {
+            "src": "/firebase-config.js",
+            "dest": "/firebase-config.js"
+        },
+        {
             "src": "/(.*)",
             "dest": "app.py"
         }
