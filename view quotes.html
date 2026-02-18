@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>View Quotes | Product Manager</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="dashboard.css?v=3" />
+
+  <!-- Custom Overrides for View Quotes -->
+  <style>
+    .quote-card {
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow 0.2s;
+    }
+
+    .quote-card:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .quote-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .quote-id {
+      font-weight: 700;
+      color: var(--primary);
+      font-size: 1.1rem;
+    }
+
+    .customer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      background: #f8fafc;
+      padding: 1rem;
+      border-radius: var(--radius-md);
+      margin-bottom: 1rem;
+    }
+
+    .customer-item span {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .customer-item strong {
+      font-size: 0.95rem;
+      color: var(--text-main);
+    }
+
+    .quote-items-table {
+      width: 100%;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .quote-items-table th {
+      background: #f1f5f9;
+      padding: 0.75rem;
+    }
+
+    .quote-items-table td {
+      border-bottom: 1px solid var(--border-color);
+      padding: 0.75rem;
+    }
+
+    .quote-footer {
+      display: flex;
+      justify-content: flex-end;
+      /* Align total to right */
+      align-items: center;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-color);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .status-badge {
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.5px;
+    }
+
+    .status-pending {
+      background: #fff7ed;
+      color: #c2410c;
+      border: 1px solid #ffedd5;
+    }
+
+    .status-accepted {
+      background: #f0fdf4;
+      color: #15803d;
+      border: 1px solid #dcfce7;
+    }
+
+    .status-rejected {
+      background: #fef2f2;
+      color: #b91c1c;
+      border: 1px solid #fee2e2;
+    }
+
+    .action-row {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 1rem;
+    }
+
+    /* Tabs Styling */
+    .tabs-container {
+      display: flex;
+      gap: 1rem;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 0px;
+      margin-bottom: 1rem;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+    }
+
+    .tab-btn:hover {
+      color: var(--primary);
+      background-color: #f8fafc;
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .tabs-actions {
+      margin-left: auto;
+      /* Push to right */
+      display: flex;
+      align-items: center;
+      padding-right: 1rem;
+    }
+  </style>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="viewquotes.js" defer></script>
+</head>
+
+<body>
+
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <i data-lucide="box" class="logo-icon"></i>
+        <span class="logo-text">Manager</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <span class="nav-label">Menu</span>
+          <button class="nav-item" onclick="window.location.href='dashboard.html'">
+            <i data-lucide="layout-grid"></i> Dashboard
+          </button>
+          <button class="nav-item" onclick="window.location.href='dashboard.html'">
+            <!-- Reuse logic? Or separate page? -->
+            <i data-lucide="plus-circle"></i> Add Product
+          </button>
+          <button class="nav-item" onclick="window.location.href='quote.html'">
+            <i data-lucide="file-plus"></i> Create Quote
+          </button>
+          <button class="nav-item active">
+            <i data-lucide="files"></i> View Quotes
+          </button>
+          <button class="nav-item" onclick="window.location.href='customers.html'">
+            <i data-lucide="users"></i> Customers
+          </button>
+        </div>
+
+        <div class="nav-section">
+          <span class="nav-label">Analytics</span>
+          <button class="nav-item" onclick="window.location.href='product-analytics.html'">
+            <i data-lucide="bar-chart-2"></i> Products
+          </button>
+          <button class="nav-item" onclick="window.location.href='quote-analytics.html'">
+            <i data-lucide="pie-chart"></i> Quotes
+          </button>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="nav-item">
+          <i data-lucide="user"></i> Profile
+        </button>
+        <button id="logoutBtn" class="nav-item danger">
+          <i data-lucide="log-out"></i> Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="top-bar">
+        <h2 class="page-title">Saved Quotes</h2>
+        <div class="search-bar">
+          <i data-lucide="search"></i>
+          <input type="text" id="quoteSearch" placeholder="Search customer name..." />
+        </div>
+      </header>
+
+      <div class="content-wrapper">
+
+        <div class="tabs-container">
+          <button class="tab-btn active" data-tab="Pending">
+            <i data-lucide="clock" style="width:16px; margin-right:6px;"></i> Pending
+          </button>
+          <button class="tab-btn" data-tab="Accepted">
+            <i data-lucide="check-circle" style="width:16px; margin-right:6px;"></i> Accepted
+          </button>
+          <button class="tab-btn" data-tab="Rejected">
+            <i data-lucide="x-circle" style="width:16px; margin-right:6px;"></i> Rejected
+          </button>
+          <button class="tab-btn" data-tab="All">
+            <i data-lucide="list" style="width:16px; margin-right:6px;"></i> All Quotes
+          </button>
+          <div class="tabs-actions">
+            <button id="exportQuotesBtn" class="btn btn-outline btn-sm">
+              <i data-lucide="download"></i> Export CSV
+            </button>
+          </div>
+        </div>
+
+        <div class="filter-bar" style="display:flex; gap:1rem; margin-bottom:1.5rem; justify-content: flex-end;">
+          <div style="display:flex; align-items:center; gap:0.5rem;">
+            <label for="quoteDateFilter" style="font-size:0.9rem; color:#64748b;">Filter Date:</label>
+            <input type="date" id="quoteDateFilter"
+              style="padding:0.5rem; border:1px solid #e2e8f0; border-radius:8px;" />
+          </div>
+        </div>
+
+        <!-- Quotes List -->
+        <div id="quoteList" style="margin-top: 2rem;">
+          <!-- Populated by JS -->
+        </div>
+    </main>
+  </div>
+
+  <script>
+    lucide.createIcons();
+
+    // Quick fix for logout since it might rely on dashboard.js logic
+    // We should ideally have a shared auth.js
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      firebase.auth().signOut().then(() => {
+        window.location.href = 'index.html';
+      });
+    });
+  </script>
+</body>
+
+</html>

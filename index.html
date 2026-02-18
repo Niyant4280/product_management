@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login | Product Manager</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+
+  <style>
+    body {
+      /* Unsplash Image - Modern Office / Tech */
+      background: url('https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80') no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* Dark Overlay */
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.65); /* Slate 900 with opacity */
+      backdrop-filter: blur(4px);
+      z-index: 0;
+    }
+
+    .login-container {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      max-width: 900px;
+      width: 90%;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+      animation: fadeIn 0.8s ease-out;
+    }
+
+    .login-visual {
+      flex: 1;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+      color: white;
+      text-align: center;
+      display: none; /* Hidden on mobile */
+    }
+
+    @media(min-width: 768px) {
+      .login-visual {
+        display: flex;
+      }
+    }
+
+    .login-visual h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .login-visual p {
+      opacity: 0.9;
+      font-size: 1.1rem;
+      max-width: 300px;
+      line-height: 1.6;
+    }
+
+    .login-form-wrapper {
+      flex: 1;
+      padding: 60px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 2rem;
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 1.25rem;
+    }
+
+    .form-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 0.5rem;
+    }
+
+    .form-subtitle {
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+    }
+
+    .input-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .btn-login {
+      width: 100%;
+      padding: 1rem;
+      font-size: 1rem;
+      margin-top: 1rem;
+    }
+
+    .form-message {
+      margin-top: 1rem;
+      color: #ef4444;
+      text-align: center;
+      font-size: 0.9rem;
+      min-height: 1.5rem;
+    }
+
+    /* Floating Shapes for Visual Side */
+    .shape {
+      position: absolute;
+      background: rgba(255,255,255,0.1);
+      border-radius: 50%;
+    }
+    .shape-1 { width: 150px; height: 150px; top: -20px; left: -20px; }
+    .shape-2 { width: 100px; height: 100px; bottom: 40px; right: 40px; }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <!-- Left Side: Visual -->
+    <div class="login-visual">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <i data-lucide="layout-dashboard" style="width: 64px; height: 64px; margin-bottom: 20px;"></i>
+      <h1>Product Manager</h1>
+      <p>Streamline your workflow, manage inventory, and track analytics in one beautiful dashboard.</p>
+    </div>
+
+    <!-- Right Side: Form -->
+    <div class="login-form-wrapper">
+      <div class="brand-logo">
+        <i data-lucide="box" style="width: 24px; height: 24px;"></i> 
+        <span>StartManaging</span>
+      </div>
+      
+      <div class="form-title">Welcome Back</div>
+      <div class="form-subtitle">Please enter your details to sign in.</div>
+
+      <form id="loginForm">
+        <div class="input-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" placeholder="name@company.com" required />
+        </div>
+        
+        <div class="input-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="••••••••" required />
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-login">
+          Sign In
+        </button>
+        
+        <div id="message" class="form-message"></div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    lucide.createIcons();
+  </script>
+  <script src="script.js"></script>
+</body>
+</html>

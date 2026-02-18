@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Quote | Product Manager</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="dashboard.css?v=3" />
+
+  <style>
+    .split-view {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 2rem;
+    }
+
+    @media (max-width: 1024px) {
+      .split-view {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-section {
+      background: white;
+      padding: 1.5rem;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-md);
+    }
+
+    .form-header {
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 1rem;
+    }
+
+    .form-header h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .cust-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .full-width {
+      grid-column: 1 / -1;
+    }
+
+    .product-selector-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+
+    .product-selector-table th {
+      background: #f8fafc;
+      padding: 0.75rem;
+      text-align: left;
+    }
+
+    .product-selector-table td {
+      border-bottom: 1px solid var(--border-color);
+      padding: 0.75rem;
+    }
+
+    .product-selector-table tr:hover {
+      background: #f1f5f9;
+    }
+
+    .selected-count {
+      background: var(--primary);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+    }
+  </style>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <script src="firebase-config.js"></script>
+  <script src="quote.js" defer></script>
+</head>
+
+<body>
+
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <i data-lucide="box" class="logo-icon"></i>
+        <span class="logo-text">Manager</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <span class="nav-label">Menu</span>
+          <button class="nav-item" onclick="window.location.href='dashboard.html'">
+            <i data-lucide="layout-grid"></i> Dashboard
+          </button>
+          <button class="nav-item" onclick="window.location.href='dashboard.html'">
+            <i data-lucide="plus-circle"></i> Add Product
+          </button>
+          <button class="nav-item active">
+            <i data-lucide="file-plus"></i> Create Quote
+          </button>
+          <button class="nav-item" onclick="window.location.href='view quotes.html'">
+            <i data-lucide="files"></i> View Quotes
+          </button>
+          <button class="nav-item" onclick="window.location.href='customers.html'">
+            <i data-lucide="users"></i> Customers
+          </button>
+        </div>
+
+        <div class="nav-section">
+          <span class="nav-label">Analytics</span>
+          <button class="nav-item" onclick="window.location.href='product-analytics.html'">
+            <i data-lucide="bar-chart-2"></i> Products
+          </button>
+          <button class="nav-item" onclick="window.location.href='quote-analytics.html'">
+            <i data-lucide="pie-chart"></i> Quotes
+          </button>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="nav-item">
+          <i data-lucide="user"></i> Profile
+        </button>
+        <button id="logoutBtn" class="nav-item danger">
+          <i data-lucide="log-out"></i> Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="top-bar">
+        <h2 class="page-title">Create New Quote</h2>
+      </header>
+
+      <div class="content-wrapper">
+
+        <div class="split-view">
+          <!-- Left: Product Selection -->
+          <div class="form-section">
+            <div class="form-header">
+              <h3><i data-lucide="shopping-cart" style="color: var(--primary);"></i> Select Products</h3>
+            </div>
+            <input type="text" id="productSearch" placeholder="Search products..." style="margin-bottom: 1rem;">
+
+            <div style="max-height: 500px; overflow-y: auto;">
+              <table id="productTable" class="product-selector-table">
+                <thead>
+                  <tr>
+                    <th width="40">Add</th>
+                    <th>Product</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Right: Customer Info -->
+          <div class="form-section">
+            <!-- Customer Information -->
+            <div class="form-header">
+              <h3><i data-lucide="user"></i> Customer Details</h3>
+            </div>
+
+            <form id="quoteForm">
+              <div class="cust-form-grid">
+                <div class="full-width">
+                  <label>Select Customer <span style="font-weight:normal; color:#666; font-size:0.85rem;">(or type
+                      manual details below)</span></label>
+                  <div style="display: flex; gap: 0.5rem;">
+                    <select id="customerSelect"
+                      style="flex: 1; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: var(--radius-md);">
+                      <option value="">-- Choose a Customer --</option>
+                    </select>
+                    <button type="button" id="refreshCustomersBtn" class="btn btn-outline" style="padding: 0.5rem;"
+                      title="Refresh List">
+                      <i data-lucide="refresh-cw" style="width: 16px; height: 16px;"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label for="cName">Client Name</label>
+                  <input type="text" id="cName" required placeholder="e.g. John Doe" />
+                </div>
+                <div>
+                  <label for="cEmail">Email Address</label>
+                  <input type="email" id="cEmail" required placeholder="john@example.com" />
+                </div>
+                <div>
+                  <label for="cPhone">Phone Number</label>
+                  <input type="tel" id="cPhone" placeholder="+91 98765 43210" />
+                </div>
+                <div>
+                  <label for="cAddress">Address</label>
+                  <input type="text" id="cAddress" placeholder="Street, City, Zip" />
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                <i data-lucide="save"></i> Save Quote
+              </button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script>
+    lucide.createIcons();
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      firebase.auth().signOut().then(() => {
+        window.location.href = 'index.html';
+      });
+    });
+  </script>
+</body>
+
+</html>

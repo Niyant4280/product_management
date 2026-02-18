@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Customers | Product Manager</title>
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="dashboard.css?v=3" />
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="customers.js" defer></script>
+</head>
+
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i data-lucide="box" class="logo-icon"></i>
+                <span class="logo-text">Manager</span>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <span class="nav-label">Menu</span>
+                    <button class="nav-item" onclick="window.location.href='dashboard.html'">
+                        <i data-lucide="layout-grid"></i> Dashboard
+                    </button>
+                    <button class="nav-item" onclick="window.location.href='add-product.html'">
+                        <i data-lucide="plus-circle"></i> Add Product
+                    </button>
+                    <button class="nav-item" onclick="window.location.href='quote.html'">
+                        <i data-lucide="file-plus"></i> Create Quote
+                    </button>
+                    <button class="nav-item" onclick="window.location.href='view quotes.html'">
+                        <i data-lucide="files"></i> View Quotes
+                    </button>
+                    <button class="nav-item active">
+                        <i data-lucide="users"></i> Customers
+                    </button>
+                </div>
+
+                <div class="nav-section">
+                    <span class="nav-label">Analytics</span>
+                    <button class="nav-item" onclick="window.location.href='product-analytics.html'">
+                        <i data-lucide="bar-chart-2"></i> Products
+                    </button>
+                    <button class="nav-item" onclick="window.location.href='quote-analytics.html'">
+                        <i data-lucide="pie-chart"></i> Quotes
+                    </button>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="nav-item" onclick="window.location.href='profile.html'">
+                    <i data-lucide="user"></i> Profile
+                </button>
+                <button id="logoutBtn" class="nav-item danger">
+                    <i data-lucide="log-out"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <h2 class="page-title">Customers</h2>
+                <div class="search-bar">
+                    <i data-lucide="search"></i>
+                    <input type="text" id="customerSearch" placeholder="Search customers..." />
+                </div>
+            </header>
+
+            <div class="content-wrapper">
+                <div class="card table-card">
+                    <div class="card-header">
+                        <h3>Client List</h3>
+                        <button id="addCustomerBtn" class="btn btn-primary btn-sm">
+                            <i data-lucide="user-plus"></i> Add Customer
+                        </button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table id="customerTable">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Address</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- JS Populated -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Customer Modal -->
+    <div id="customerModal" class="modal" style="display:none;">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="close" id="closeCustomerModal">&times;</span>
+            <h3 id="modalTitle">Add Customer</h3>
+            <form id="customerForm" style="display: grid; gap: 1rem; margin-top: 1rem;">
+                <input type="hidden" id="customerId">
+                <div>
+                    <label>Name</label>
+                    <input type="text" id="custName" required
+                        style="width:100%; padding:0.5rem; margin-top:0.25rem; border:1px solid #ccc; border-radius:4px;">
+                </div>
+                <div>
+                    <label>Email</label>
+                    <input type="email" id="custEmail" required
+                        style="width:100%; padding:0.5rem; margin-top:0.25rem; border:1px solid #ccc; border-radius:4px;">
+                </div>
+                <div>
+                    <label>Phone</label>
+                    <input type="tel" id="custPhone"
+                        style="width:100%; padding:0.5rem; margin-top:0.25rem; border:1px solid #ccc; border-radius:4px;">
+                </div>
+                <div>
+                    <label>Address</label>
+                    <textarea id="custAddress" rows="3"
+                        style="width:100%; padding:0.5rem; margin-top:0.25rem; border:1px solid #ccc; border-radius:4px;"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Save Customer</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

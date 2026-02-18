@@ -1,0 +1,151 @@
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #e0f7fa, #ffffff);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  padding: 30px 15px;
+}
+
+
+body::before, body::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.4;
+  z-index: -1;
+}
+body::before {
+  width: 350px;
+  height: 350px;
+  background: #64b5f6;
+  top: -80px;
+  left: -80px;
+}
+body::after {
+  width: 300px;
+  height: 300px;
+  background: #81c784;
+  bottom: -100px;
+  right: -50px;
+}
+
+
+h1 {
+  text-align: center;
+  font-size: 2.8rem;
+  color: #1a237e;
+  margin-bottom: 30px;
+  animation: fadeInDown 0.7s ease-out forwards;
+}
+
+
+.quote-box {
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  padding: 25px 30px;
+  margin: 20px auto;
+  width: 95%;
+  max-width: 750px;
+  animation: fadeInUp 0.7s ease both;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.quote-box:hover {
+  transform: scale(1.01);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+}
+
+
+.quote-box h3 {
+  margin-bottom: 10px;
+  color: #333;
+}
+.quote-box p {
+  margin: 6px 0;
+  color: #444;
+  font-size: 0.95rem;
+}
+.quote-box strong {
+  color: #1e88e5;
+}
+
+
+.quote-products {
+  margin-top: 15px;
+}
+.quote-products h4 {
+  margin-bottom: 8px;
+  color: #37474f;
+}
+
+.quote-products table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+.quote-products th,
+.quote-products td {
+  padding: 10px;
+  text-align: center;
+  border: 1px solid #ccc;
+}
+.quote-products th {
+  background-color: #f1f1f1;
+  color: #333;
+}
+
+
+.print-btn {
+  background-color: #1e88e5;
+  color: white;
+  padding: 10px 16px;
+  margin-top: 16px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+.print-btn:hover {
+  background-color: #1565c0;
+}
+
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+@media (max-width: 600px) {
+  .quote-box {
+    padding: 18px 20px;
+  }
+
+  .quote-products table th,
+  .quote-products table td {
+    font-size: 0.85rem;
+    padding: 8px;
+  }
+}

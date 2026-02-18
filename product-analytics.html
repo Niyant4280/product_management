@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Product Analytics | Product Manager</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js CDN -->
+
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="dashboard.css" />
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="product-analytics.js" defer></script>
+
+  <style>
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: transform 0.2s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+
+    .icon-purple {
+      background: linear-gradient(135deg, #8b5cf6, #6366f1);
+    }
+
+    .icon-blue {
+      background: linear-gradient(135deg, #3b82f6, #0ea5e9);
+    }
+
+    .icon-amber {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+    }
+
+    .stat-info h4 {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .stat-info p {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 900px) {
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .chart-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      min-height: 400px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chart-card h3 {
+      margin-top: 0;
+      margin-bottom: 1rem;
+      color: var(--text-main);
+      font-size: 1.1rem;
+    }
+
+    .chart-container {
+      flex: 1;
+      position: relative;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <i data-lucide="box" class="logo-icon"></i>
+        <span class="logo-text">Manager</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <span class="nav-label">Menu</span>
+          <button class="nav-item" onclick="window.location.href='dashboard.html'">
+            <i data-lucide="layout-grid"></i> Dashboard
+          </button>
+          <button class="nav-item" onclick="window.location.href='input-product.html'">
+            <!-- Note: changed link if needed -->
+            <i data-lucide="plus-circle"></i> Add Product
+          </button>
+          <button class="nav-item" onclick="window.location.href='quote.html'">
+            <i data-lucide="file-plus"></i> Create Quote
+          </button>
+          <button class="nav-item" onclick="window.location.href='view quotes.html'">
+            <i data-lucide="files"></i> View Quotes
+          </button>
+          <button class="nav-item" onclick="window.location.href='customers.html'">
+            <i data-lucide="users"></i> Customers
+          </button>
+        </div>
+
+        <div class="nav-section">
+          <span class="nav-label">Analytics</span>
+          <button class="nav-item active">
+            <i data-lucide="bar-chart-2"></i> Products
+          </button>
+          <button class="nav-item" onclick="window.location.href='quote-analytics.html'">
+            <i data-lucide="pie-chart"></i> Quotes
+          </button>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="nav-item">
+          <i data-lucide="user"></i> Profile
+        </button>
+        <button id="logoutBtn" class="nav-item danger">
+          <i data-lucide="log-out"></i> Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="top-bar">
+        <h2 class="page-title">Product Analytics</h2>
+      </header>
+
+      <div class="content-wrapper">
+
+        <!-- Stats Cards -->
+        <div id="productStats" class="analytics-grid">
+          <!-- JS Injected -->
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-grid">
+          <div class="chart-card">
+            <h3>Products by Category (Python)</h3>
+            <div class="chart-container" style="display: flex; justify-content: center; align-items: center;">
+              <img src="/plot/product_category" style="max-width: 100%; max-height: 100%;"
+                alt="Products by Category Chart">
+            </div>
+          </div>
+          <div class="chart-card">
+            <h3>Stock Distribution (Python)</h3>
+            <div class="chart-container" style="display: flex; justify-content: center; align-items: center;">
+              <img src="/plot/product_stock" style="max-width: 100%; max-height: 100%;" alt="Stock Distribution Chart">
+            </div>
+          </div>
+        </div>
+
+        <!-- List for Low Stock -->
+        <div id="lowStockSection" class="chart-card" style="min-height: auto;">
+          <h3><i data-lucide="alert-triangle" style="color: #f59e0b; width: 20px; vertical-align: middle;"></i> Low
+            Stock Alerts</h3>
+          <div id="lowStockList"></div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script>
+    lucide.createIcons();
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      firebase.auth().signOut().then(() => {
+        window.location.href = 'index.html';
+      });
+    });
+  </script>
+</body>
+
+</html>

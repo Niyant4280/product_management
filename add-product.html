@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add Product | Product Manager</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="dashboard.css" />
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+
+  <style>
+    .form-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      max-width: 600px;
+      margin: 0 auto;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border-color);
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <i data-lucide="box" class="logo-icon"></i>
+        <span class="logo-text">Manager</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <span class="nav-label">Menu</span>
+          <button class="nav-item" onclick="window.location.href='dashboard.html'">
+            <i data-lucide="layout-grid"></i> Dashboard
+          </button>
+          <button class="nav-item active">
+            <i data-lucide="plus-circle"></i> Add Product
+          </button>
+          <button class="nav-item" onclick="window.location.href='quote.html'">
+            <i data-lucide="file-plus"></i> Create Quote
+          </button>
+          <button class="nav-item" onclick="window.location.href='view quotes.html'">
+            <i data-lucide="files"></i> View Quotes
+          </button>
+          <button class="nav-item" onclick="window.location.href='customers.html'">
+            <i data-lucide="users"></i> Customers
+          </button>
+        </div>
+
+        <div class="nav-section">
+          <span class="nav-label">Analytics</span>
+          <button class="nav-item" onclick="window.location.href='product-analytics.html'">
+            <i data-lucide="bar-chart-2"></i> Products
+          </button>
+          <button class="nav-item" onclick="window.location.href='quote-analytics.html'">
+            <i data-lucide="pie-chart"></i> Quotes
+          </button>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="nav-item">
+          <i data-lucide="user"></i> Profile
+        </button>
+        <button id="logoutBtn" class="nav-item danger">
+          <i data-lucide="log-out"></i> Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="top-bar">
+        <h2 class="page-title">Add New Product</h2>
+      </header>
+
+      <div class="content-wrapper">
+        <div class="form-card">
+          <form id="addProductForm" class="form-grid">
+            <div>
+              <label for="name">Product Name</label>
+              <input id="name" type="text" placeholder="e.g., Wireless Headphones" required />
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+              <div>
+                <label for="price">Price (₹)</label>
+                <input id="price" type="number" min="0" step="0.01" placeholder="1999" required />
+              </div>
+              <div>
+                <label for="stock">Stock</label>
+                <input id="stock" type="number" min="0" placeholder="10" required />
+              </div>
+            </div>
+
+            <div>
+              <label for="category">Category</label>
+              <input id="category" type="text" placeholder="Electronics" required />
+            </div>
+
+            <div>
+              <label for="status">Status</label>
+              <select id="status" required>
+                <option value="Available">Available</option>
+                <option value="Out of Stock">Out of Stock</option>
+                <option value="Discontinued">Discontinued</option>
+              </select>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary" style="flex: 1;">
+                <i data-lucide="save"></i> Save Product
+              </button>
+              <button type="button" id="cancelBtn" class="btn btn-outline">Cancel</button>
+            </div>
+
+            <div id="formMsg" style="text-align: center; font-size: 0.9rem; margin-top: 0.5rem;"></div>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="add-product.js" defer></script>
+</body>
+
+</html>

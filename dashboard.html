@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard | Product Manager</title>
+
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="dashboard.css?v=3" />
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="dashboard.js" defer></script>
+</head>
+
+<body>
+
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <i data-lucide="box" class="logo-icon"></i>
+        <span class="logo-text">Manager</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <span class="nav-label">Menu</span>
+          <button id="dashboardNavBtn" class="nav-item active">
+            <i data-lucide="layout-grid"></i> Dashboard
+          </button>
+          <button id="addProductBtn" class="nav-item">
+            <i data-lucide="plus-circle"></i> Add Product
+          </button>
+          <button id="createQuoteBtn" class="nav-item">
+            <i data-lucide="file-plus"></i> Create Quote
+          </button>
+          <button class="nav-item" onclick="window.location.href='view quotes.html'">
+            <i data-lucide="files"></i> View Quotes
+          </button>
+          <button class="nav-item" onclick="window.location.href='customers.html'">
+            <i data-lucide="users"></i> Customers
+          </button>
+        </div>
+
+        <div class="nav-section">
+          <span class="nav-label">Analytics</span>
+          <button id="productAnalyticsBtn" class="nav-item">
+            <i data-lucide="bar-chart-2"></i> Products
+          </button>
+          <button id="quoteAnalyticsBtn" class="nav-item">
+            <i data-lucide="pie-chart"></i> Quotes
+          </button>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button id="profileBtn" class="nav-item">
+          <i data-lucide="user"></i> Profile
+        </button>
+        <button id="logoutBtn" class="nav-item danger">
+          <i data-lucide="log-out"></i> Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Top Header -->
+      <header class="top-bar">
+        <h2 class="page-title">Overview</h2>
+        <div class="search-bar">
+          <i data-lucide="search"></i>
+          <input type="text" id="productSearch" placeholder="Search products..." />
+        </div>
+      </header>
+
+      <div class="content-wrapper">
+
+        <!-- Stats Row -->
+        <div class="stats-row">
+          <div class="card stat-card">
+            <div class="stat-icon bg-blue-100 text-blue-600">
+              <i data-lucide="package"></i>
+            </div>
+            <div>
+              <p class="stat-label">Total Products</p>
+              <h3 class="stat-value" id="statTotalProducts">0</h3>
+            </div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-icon bg-red-100 text-red-600">
+              <i data-lucide="alert-circle"></i>
+            </div>
+            <div>
+              <p class="stat-label">Low Stock</p>
+              <h3 class="stat-value" id="statLowStock">0</h3>
+            </div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-icon bg-green-100 text-green-600">
+              <i data-lucide="dollar-sign"></i>
+            </div>
+            <div>
+              <p class="stat-label">Inventory Value</p>
+              <h3 class="stat-value" id="statInventoryValue">₹0</h3>
+            </div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-icon bg-orange-100 text-orange-600">
+              <i data-lucide="clock"></i>
+            </div>
+            <div>
+              <p class="stat-label">Pending Quotes</p>
+              <h3 class="stat-value" id="statPendingQuotes">0</h3>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <!-- Main Content (Filters + Table) -->
+          <div class="main-column">
+            <!-- Filters Card -->
+            <div class="card filter-card">
+              <div class="filter-group">
+                <label>Category</label>
+                <select id="categoryFilter">
+                  <option value="">All Categories</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label>Status</label>
+                <select id="statusFilter">
+                  <option value="">All Statuses</option>
+                  <option value="Available">Available</option>
+                  <option value="Out of Stock">Out of Stock</option>
+                  <option value="Discontinued">Discontinued</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label>Sort By</label>
+                <select id="sortBy">
+                  <option value="">Default</option>
+                  <option value="name-asc">Name (A-Z)</option>
+                  <option value="name-desc">Name (Z-A)</option>
+                  <option value="price-asc">Price (Low-High)</option>
+                  <option value="price-desc">Price (High-Low)</option>
+                  <option value="stock-asc">Stock (Low-High)</option>
+                  <option value="stock-desc">Stock (High-Low)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Products Table Card -->
+            <div class="card table-card">
+              <div class="card-header">
+                <h3>Product Inventory</h3>
+                <div class="header-actions">
+                  <button id="exportBtn" class="btn btn-outline btn-sm">
+                    <i data-lucide="download"></i> Export CSV
+                  </button>
+                  <button id="bulkDeleteBtn" class="btn btn-outline btn-sm">
+                    <i data-lucide="trash-2"></i> Delete Selected
+                  </button>
+                </div>
+              </div>
+
+              <div class="table-responsive">
+                <table id="productTable">
+                  <thead>
+                    <tr>
+                      <th width="40"><input type="checkbox" id="selectAllCheckbox" /></th>
+                      <th>Product Name</th>
+                      <th>Price</th>
+                      <th>Category</th>
+                      <th>Stock</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- JS Populated -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div> <!-- End main-column -->
+
+          <!-- Recent Activity Sidebar -->
+          <div class="activity-column">
+            <div class="card activity-card">
+              <h3>Recent Activity</h3>
+              <div id="activityLog" class="activity-list">
+                <!-- JS Populated -->
+                <p class="text-muted text-sm">Loading activity...</p>
+              </div>
+            </div>
+          </div>
+
+        </div> <!-- End dashboard-grid -->
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal (Hidden) -->
+  <div id="productModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h3>Product Details</h3>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+
+</html>

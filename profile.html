@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Profile | Product Manager</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="dashboard.css" />
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="profile.js" defer></script>
+
+  <style>
+    .profile-card {
+      background: white;
+      padding: 2rem;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-md);
+      max-width: 600px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .profile-avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      font-size: 2.5rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem auto;
+      box-shadow: var(--shadow-md);
+    }
+
+    .profile-form {
+      text-align: left;
+      margin-top: 2rem;
+      display: grid;
+      gap: 1.5rem;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <i data-lucide="box" class="logo-icon"></i>
+        <span class="logo-text">Manager</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <span class="nav-label">Menu</span>
+          <button class="nav-item" onclick="window.location.href='dashboard.html'">
+            <i data-lucide="layout-grid"></i> Dashboard
+          </button>
+          <button class="nav-item" onclick="window.location.href='dashboard.html'">
+            <i data-lucide="plus-circle"></i> Add Product
+          </button>
+          <button class="nav-item" onclick="window.location.href='quote.html'">
+            <i data-lucide="file-plus"></i> Create Quote
+          </button>
+          <button class="nav-item" onclick="window.location.href='view quotes.html'">
+            <i data-lucide="files"></i> View Quotes
+          </button>
+          <button class="nav-item" onclick="window.location.href='customers.html'">
+            <i data-lucide="users"></i> Customers
+          </button>
+        </div>
+
+        <div class="nav-section">
+          <span class="nav-label">Analytics</span>
+          <button class="nav-item" onclick="window.location.href='product-analytics.html'">
+            <i data-lucide="bar-chart-2"></i> Products
+          </button>
+          <button class="nav-item" onclick="window.location.href='quote-analytics.html'">
+            <i data-lucide="pie-chart"></i> Quotes
+          </button>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="nav-item active">
+          <i data-lucide="user"></i> Profile
+        </button>
+        <button id="logoutBtn" class="nav-item danger">
+          <i data-lucide="log-out"></i> Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="top-bar">
+        <h2 class="page-title">My Profile</h2>
+      </header>
+
+      <div class="content-wrapper">
+        <div class="profile-card">
+          <div class="profile-avatar" id="profileAvatar">U</div>
+          <h3 style="margin: 0;">User Account</h3>
+          <p style="color: var(--text-muted); margin-top: 4px;">Manage your settings and password.</p>
+
+          <form id="profileForm" class="profile-form" autocomplete="off">
+            <div>
+              <label for="displayName">Display Name</label>
+              <input type="text" id="displayName" placeholder="Your Name" />
+            </div>
+            <div>
+              <label for="email">Email</label>
+              <input type="email" id="email" disabled style="background: #f3f4f6; color: #888;" />
+            </div>
+
+            <div style="border-top: 1px solid var(--border-color); margin: 1rem 0;"></div>
+
+            <div>
+              <label for="newPassword">New Password</label>
+              <input type="password" id="newPassword" placeholder="Leave blank to keep current" />
+            </div>
+            <div>
+              <label for="currentPassword">Current Password <span style="color:#ef4444;">*</span></label>
+              <input type="password" id="currentPassword" placeholder="Required to save changes" />
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+              <button type="submit" class="btn btn-primary" style="flex: 1;">Update Profile</button>
+              <button type="button" id="backBtn" class="btn btn-outline">Back</button>
+            </div>
+            <div id="profileMessage" style="text-align: center; margin-top: 1rem; font-size: 0.9rem;"></div>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    lucide.createIcons();
+
+    // Avatar Logic
+    document.addEventListener('DOMContentLoaded', function () {
+      firebase.auth().onAuthStateChanged(function (user) {
+        if (user) {
+          const avatar = document.getElementById('profileAvatar');
+          let initials = 'U';
+          if (user.displayName) {
+            initials = user.displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+          } else if (user.email) {
+            initials = user.email[0].toUpperCase();
+          }
+          avatar.textContent = initials;
+        }
+      });
+
+      // Logout
+      document.getElementById('logoutBtn').addEventListener('click', () => {
+        firebase.auth().signOut().then(() => {
+          window.location.href = 'index.html';
+        });
+      });
+    });
+  </script>
+</body>
+
+</html>
