@@ -4,6 +4,10 @@
         {
             "src": "app.py",
             "use": "@vercel/python"
+        },
+        {
+            "src": "firebase-config.js",
+            "use": "@vercel/static"
         }
     ],
     "routes": [
