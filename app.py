@@ -25,6 +25,34 @@ def serve_static(path):
         return send_from_directory(basedir, path)
     return "File not found", 404
 
+# --- Security: Dynamic Firebase Config ---
+@app.route('/firebase-config.js')
+def serve_firebase_config():
+    # Load from env vars
+    api_key = os.getenv("GOOGLE_API_KEY")
+    project_id = os.getenv("PROJECT_ID")
+    
+    # Construct JS content
+    config_js = f"""
+    const firebaseConfig = {{
+        apiKey: "{api_key}",
+        authDomain: "{project_id}.firebaseapp.com",
+        projectId: "{project_id}",
+        storageBucket: "{project_id}.firebasestorage.app",
+        messagingSenderId: "17978104214",
+        appId: "1:17978104214:web:efeb529844156dee5ae5b7",
+        measurementId: "G-EWW793K897"
+    }};
+
+    firebase.initializeApp(firebaseConfig);
+
+    // Initialize Firebase Services
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    """
+    
+    return config_js, 200, {'Content-Type': 'application/javascript'}
+
 # --- Chart Endpoints (Corrected: Receive Data via POST) ---
 
 @app.route('/render/product_category', methods=['POST'])
