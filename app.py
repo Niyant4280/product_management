@@ -4,6 +4,9 @@ import matplotlib.pyplot as plt
 import io
 from flask import Flask, send_file, send_from_directory, request, jsonify
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__, static_folder='.', static_url_path='')
 
