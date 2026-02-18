@@ -270,7 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       alert("✅ Quote Created Successfully!");
       if (window.logActivity) window.logActivity('create_quote', `Created quote for ${customer.name}`);
-      window.location.href = 'view quotes.html';
+      window.location.href = "view_quotes.html";
 
     } catch (err) {
       console.error("Transaction failed:", err);
