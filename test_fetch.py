@@ -1,8 +1,13 @@
 import requests
 import json
 
-PROJECT_ID = "productmanagement-dd3d9"
-API_KEY = "AIzaSyAhMolMoUpwOicmDlsVLI7iktI04tRuMh8"
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+PROJECT_ID = os.getenv("PROJECT_ID")
+API_KEY = os.getenv("GOOGLE_API_KEY")
 BASE_URL = f"https://firestore.googleapis.com/v1/projects/{PROJECT_ID}/databases/(default)/documents"
 
 def get_firestore_data(collection):
