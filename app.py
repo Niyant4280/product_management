@@ -19,7 +19,10 @@ def index():
 @app.route('/firebase-config.js')
 def firebase_config():
     api_key = os.environ.get('FIREBASE_API_KEY', '')
-    config_js = f"""// Firebase configuration - served dynamically
+
+    # If env var is set, serve dynamically (production/Vercel)
+    if api_key:
+        config_js = f"""// Firebase configuration - served dynamically
 const firebaseConfig = {{
     apiKey: "{api_key}",
     authDomain: "productmanagement-dd3d9.firebaseapp.com",
@@ -36,8 +39,15 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 """
-    from flask import Response
-    return Response(config_js, mimetype='application/javascript')
+        from flask import Response
+        return Response(config_js, mimetype='application/javascript')
+
+    # Fall back to static file (local development)
+    static_config = os.path.join(basedir, 'firebase-config.js')
+    if os.path.exists(static_config):
+        return send_from_directory(basedir, 'firebase-config.js')
+
+    return "firebase-config.js not found. Set FIREBASE_API_KEY environment variable.", 404
 
 
 @app.route('/<path:path>')
