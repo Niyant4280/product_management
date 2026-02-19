@@ -16,6 +16,30 @@ def index():
     return send_from_directory(basedir, 'index.html')
 
 
+@app.route('/firebase-config.js')
+def firebase_config():
+    api_key = os.environ.get('FIREBASE_API_KEY', '')
+    config_js = f"""// Firebase configuration - served dynamically
+const firebaseConfig = {{
+    apiKey: "{api_key}",
+    authDomain: "productmanagement-dd3d9.firebaseapp.com",
+    projectId: "productmanagement-dd3d9",
+    storageBucket: "productmanagement-dd3d9.firebasestorage.app",
+    messagingSenderId: "17978104214",
+    appId: "1:17978104214:web:efeb529844156dee5ae5b7",
+    measurementId: "G-EWW793K897"
+}};
+
+firebase.initializeApp(firebaseConfig);
+
+// Initialize Firebase Services
+const auth = firebase.auth();
+const db = firebase.firestore();
+"""
+    from flask import Response
+    return Response(config_js, mimetype='application/javascript')
+
+
 @app.route('/<path:path>')
 def serve_static(path):
     # Security check: prevent traversing up directories
