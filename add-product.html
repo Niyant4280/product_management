@@ -11,12 +11,16 @@
 
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="dashboard.css" />
+  <link rel="stylesheet" href="toast.css" />
+  <link rel="stylesheet" href="command-palette.css" />
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="firebase-config.js?v=2"></script>
+  <script src="utils.js"></script>
+  <script src="toast.js"></script>
 
   <style>
     .form-card {
@@ -84,9 +88,7 @@
       </nav>
 
       <div class="sidebar-footer">
-        <button class="nav-item">
-          <i data-lucide="user"></i> Profile
-        </button>
+        <!-- sidebar-user.js injects user badge -->
         <button id="logoutBtn" class="nav-item danger">
           <i data-lucide="log-out"></i> Logout
         </button>
@@ -104,7 +106,16 @@
           <form id="addProductForm" class="form-grid">
             <div>
               <label for="name">Product Name</label>
-              <input id="name" type="text" placeholder="e.g., Wireless Headphones" required />
+              <div style="display:flex;gap:0.5rem;align-items:flex-start;">
+                <div style="flex:1;">
+                  <input id="name" type="text" placeholder="e.g., Wireless Headphones" required />
+                  <!-- Duplicate Warning injected here by JS -->
+                  <div id="duplicateWarning"></div>
+                </div>
+                <button type="button" id="scanBarcodeBtn" class="btn btn-outline btn-sm" title="Scan barcode with camera" style="margin-top:2px;white-space:nowrap;display:flex;align-items:center;gap:5px;">
+                  <i data-lucide="scan-line" style="width:15px;height:15px;"></i> Scan
+                </button>
+              </div>
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
@@ -146,7 +157,35 @@
     </main>
   </div>
 
+  <!-- Barcode Scanner Modal -->
+  <div id="barcodeModal" class="modal" style="display:none;">
+    <div class="modal-content" style="max-width:480px;text-align:center;">
+      <span class="close" id="closeBarcodeModal">&times;</span>
+      <h3 style="margin-bottom:0.5rem;">📷 Barcode Scanner</h3>
+      <p style="color:#64748b;font-size:0.88rem;margin-bottom:1rem;">Point your camera at a product barcode</p>
+      <div style="position:relative;border-radius:12px;overflow:hidden;background:#0f172a;aspect-ratio:4/3;">
+        <video id="barcodeVideo" style="width:100%;height:100%;object-fit:cover;" autoplay playsinline muted></video>
+        <!-- Scanning crosshair overlay -->
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;">
+          <div style="width:220px;height:100px;border:2px solid #6366f1;border-radius:8px;box-shadow:0 0 0 9999px rgba(0,0,0,0.5);animation:pulse-border 1.5s ease infinite;"></div>
+        </div>
+        <div style="position:absolute;top:10px;left:10px;background:rgba(99,102,241,0.9);color:white;font-size:0.75rem;font-weight:600;padding:4px 10px;border-radius:20px;">LIVE</div>
+      </div>
+      <p style="margin-top:0.75rem;font-size:0.85rem;color:#94a3b8;" id="scanStatus">Initializing...</p>
+      <button class="btn btn-outline" id="cancelScanBtn" style="margin-top:0.5rem;">Cancel</button>
+    </div>
+  </div>
+
+  <style>
+    @keyframes pulse-border {
+      0%,100% { box-shadow: 0 0 0 9999px rgba(0,0,0,0.5), 0 0 0 2px rgba(99,102,241,0.5); }
+      50%      { box-shadow: 0 0 0 9999px rgba(0,0,0,0.5), 0 0 15px 4px rgba(99,102,241,0.8); }
+    }
+  </style>
+
   <script src="add-product.js" defer></script>
+  <script src="sidebar-user.js" defer></script>
+  <script src="command-palette.js" defer></script>
 </body>
 
 </html>

@@ -8,7 +8,10 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js CDN -->
+  <link rel="stylesheet" href="toast.css" />
+  <link rel="stylesheet" href="command-palette.css" />
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="dashboard.css" />
@@ -135,8 +138,7 @@
           <button class="nav-item" onclick="window.location.href='dashboard.html'">
             <i data-lucide="layout-grid"></i> Dashboard
           </button>
-          <button class="nav-item" onclick="window.location.href='input-product.html'">
-            <!-- Note: changed link if needed -->
+          <button class="nav-item" onclick="window.location.href='add-product.html'">
             <i data-lucide="plus-circle"></i> Add Product
           </button>
           <button class="nav-item" onclick="window.location.href='quote.html'">
@@ -162,9 +164,7 @@
       </nav>
 
       <div class="sidebar-footer">
-        <button class="nav-item">
-          <i data-lucide="user"></i> Profile
-        </button>
+        <!-- sidebar-user.js injects user badge -->
         <button id="logoutBtn" class="nav-item danger">
           <i data-lucide="log-out"></i> Logout
         </button>
@@ -187,17 +187,12 @@
         <!-- Charts -->
         <div class="charts-grid">
           <div class="chart-card">
-            <h3>Products by Category (Python)</h3>
-            <div class="chart-container" style="display: flex; justify-content: center; align-items: center;">
-              <img src="/plot/product_category" style="max-width: 100%; max-height: 100%;"
-                alt="Products by Category Chart">
-            </div>
+            <h3>Products by Category</h3>
+            <div class="chart-container"><canvas id="categoryChart"></canvas></div>
           </div>
           <div class="chart-card">
-            <h3>Stock Distribution (Python)</h3>
-            <div class="chart-container" style="display: flex; justify-content: center; align-items: center;">
-              <img src="/plot/product_stock" style="max-width: 100%; max-height: 100%;" alt="Stock Distribution Chart">
-            </div>
+            <h3>Stock Status Distribution</h3>
+            <div class="chart-container"><canvas id="stockChart"></canvas></div>
           </div>
         </div>
 
@@ -221,6 +216,8 @@
       });
     });
   </script>
+  <script src="sidebar-user.js" defer></script>
+  <script src="command-palette.js" defer></script>
 </body>
 
 </html>

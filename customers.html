@@ -6,21 +6,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Customers | Product Manager</title>
 
-    <!-- Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- Styles -->
     <link rel="stylesheet" href="styles.css" />
-    <link rel="stylesheet" href="dashboard.css?v=3" />
+    <link rel="stylesheet" href="dashboard.css?v=4" />
+    <link rel="stylesheet" href="toast.css" />
+    <link rel="stylesheet" href="command-palette.css" />
 
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <script src="firebase-config.js?v=2"></script>
+
+    <!-- Shared -->
+    <script src="utils.js"></script>
+    <script src="toast.js"></script>
     <script src="customers.js" defer></script>
+    <script src="sidebar-user.js" defer></script>
+    <script src="command-palette.js" defer></script>
 </head>
 
 <body>
@@ -65,9 +70,7 @@
             </nav>
 
             <div class="sidebar-footer">
-                <button class="nav-item" onclick="window.location.href='profile.html'">
-                    <i data-lucide="user"></i> Profile
-                </button>
+                <!-- sidebar-user.js injects user badge -->
                 <button id="logoutBtn" class="nav-item danger">
                     <i data-lucide="log-out"></i> Logout
                 </button>
@@ -82,9 +85,16 @@
                     <i data-lucide="search"></i>
                     <input type="text" id="customerSearch" placeholder="Search customers..." />
                 </div>
+                <button class="btn btn-outline btn-sm" onclick="CommandPalette.open()" title="Ctrl+K" style="display:flex;align-items:center;gap:6px;margin-left:auto;">
+                    <i data-lucide="terminal" style="width:15px;height:15px;"></i>
+                    <span style="font-size:0.78rem;">⌘K</span>
+                </button>
             </header>
 
             <div class="content-wrapper">
+                <!-- RFM Segment Legend (injected by customers.js) -->
+                <div id="rfmLegend"></div>
+
                 <div class="card table-card">
                     <div class="card-header">
                         <h3>Client List</h3>
@@ -101,6 +111,7 @@
                                     <th>Email</th>
                                     <th>Phone</th>
                                     <th>Address</th>
+                                    <th>RFM Segment</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -116,31 +127,15 @@
 
     <!-- Add/Edit Customer Modal -->
     <div id="customerModal" class="modal" style="display:none;">
-        <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-content" style="max-width:500px;">
             <span class="close" id="closeCustomerModal">&times;</span>
             <h3 id="modalTitle">Add Customer</h3>
-            <form id="customerForm" style="display: grid; gap: 1rem; margin-top: 1rem;">
+            <form id="customerForm" style="display:grid;gap:1rem;margin-top:1rem;">
                 <input type="hidden" id="customerId">
-                <div>
-                    <label>Name</label>
-                    <input type="text" id="custName" required
-                        style="width:100%; padding:0.5rem; margin-top:0.25rem; border:1px solid #ccc; border-radius:4px;">
-                </div>
-                <div>
-                    <label>Email</label>
-                    <input type="email" id="custEmail" required
-                        style="width:100%; padding:0.5rem; margin-top:0.25rem; border:1px solid #ccc; border-radius:4px;">
-                </div>
-                <div>
-                    <label>Phone</label>
-                    <input type="tel" id="custPhone"
-                        style="width:100%; padding:0.5rem; margin-top:0.25rem; border:1px solid #ccc; border-radius:4px;">
-                </div>
-                <div>
-                    <label>Address</label>
-                    <textarea id="custAddress" rows="3"
-                        style="width:100%; padding:0.5rem; margin-top:0.25rem; border:1px solid #ccc; border-radius:4px;"></textarea>
-                </div>
+                <div><label>Name *</label><input type="text" id="custName" required placeholder="Full Name"></div>
+                <div><label>Email *</label><input type="email" id="custEmail" required placeholder="email@example.com"></div>
+                <div><label>Phone</label><input type="tel" id="custPhone" placeholder="+91 98765 43210"></div>
+                <div><label>Address</label><textarea id="custAddress" rows="3" placeholder="Street, City, State"></textarea></div>
                 <button type="submit" class="btn btn-primary">Save Customer</button>
             </form>
         </div>

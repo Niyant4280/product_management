@@ -10,9 +10,31 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="dashboard.css?v=3" />
+  <link rel="stylesheet" href="dashboard.css?v=4" />
+  <link rel="stylesheet" href="toast.css" />
+  <link rel="stylesheet" href="command-palette.css" />
+  <link rel="stylesheet" href="viewquotes.css" />
 
-  <!-- Custom Overrides for View Quotes -->
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js?v=2"></script>
+
+  <!-- jsPDF for PDF Download -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+  <!-- EmailJS for email sending -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="emailjs-config.js"></script>
+
+  <!-- Shared -->
+  <script src="utils.js"></script>
+  <script src="toast.js"></script>
+  <script src="viewquotes.js" defer></script>
+  <script src="sidebar-user.js" defer></script>
+  <script src="command-palette.js" defer></script>
+
   <style>
     .quote-card {
       background: white;
@@ -21,13 +43,12 @@
       padding: 1.5rem;
       margin-bottom: 1.5rem;
       box-shadow: var(--shadow-sm);
-      transition: box-shadow 0.2s;
+      transition: box-shadow 0.2s, transform 0.2s;
     }
-
     .quote-card:hover {
       box-shadow: var(--shadow-md);
+      transform: translateY(-1px);
     }
-
     .quote-header-row {
       display: flex;
       justify-content: space-between;
@@ -36,142 +57,40 @@
       padding-bottom: 1rem;
       border-bottom: 1px solid var(--border-color);
     }
-
-    .quote-id {
-      font-weight: 700;
-      color: var(--primary);
-      font-size: 1.1rem;
-    }
-
+    .quote-id { font-weight: 700; color: var(--primary); font-size: 1.05rem; }
     .customer-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 0.75rem;
       background: #f8fafc;
       padding: 1rem;
       border-radius: var(--radius-md);
       margin-bottom: 1rem;
     }
-
-    .customer-item span {
-      display: block;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
-
-    .customer-item strong {
-      font-size: 0.95rem;
-      color: var(--text-main);
-    }
-
-    .quote-items-table {
-      width: 100%;
-      margin-top: 1rem;
-      font-size: 0.9rem;
-    }
-
-    .quote-items-table th {
-      background: #f1f5f9;
-      padding: 0.75rem;
-    }
-
-    .quote-items-table td {
-      border-bottom: 1px solid var(--border-color);
-      padding: 0.75rem;
-    }
-
+    .customer-item span { display: block; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 2px; }
+    .customer-item strong { font-size: 0.9rem; color: var(--text-main); }
+    .quote-items-table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; font-size: 0.88rem; }
+    .quote-items-table th { background: #f1f5f9; padding: 0.65rem 0.75rem; text-align: left; font-weight: 600; color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; }
+    .quote-items-table td { border-bottom: 1px solid var(--border-color); padding: 0.6rem 0.75rem; }
     .quote-footer {
-      display: flex;
-      justify-content: flex-end;
-      /* Align total to right */
-      align-items: center;
-      margin-top: 1rem;
-      padding-top: 1rem;
-      border-top: 1px solid var(--border-color);
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--text-main);
+      display: flex; justify-content: flex-end;
+      align-items: center; margin-top: 1rem;
+      padding-top: 1rem; border-top: 1px solid var(--border-color);
+      font-size: 1.1rem; font-weight: 700; color: var(--primary);
     }
-
-    .status-badge {
-      text-transform: uppercase;
-      font-size: 0.75rem;
-      letter-spacing: 0.5px;
-    }
-
-    .status-pending {
-      background: #fff7ed;
-      color: #c2410c;
-      border: 1px solid #ffedd5;
-    }
-
-    .status-accepted {
-      background: #f0fdf4;
-      color: #15803d;
-      border: 1px solid #dcfce7;
-    }
-
-    .status-rejected {
-      background: #fef2f2;
-      color: #b91c1c;
-      border: 1px solid #fee2e2;
-    }
-
-    .action-row {
-      display: flex;
-      gap: 10px;
-      justify-content: flex-end;
-      margin-top: 1rem;
-    }
-
-    /* Tabs Styling */
-    .tabs-container {
-      display: flex;
-      gap: 1rem;
-      border-bottom: 2px solid #e2e8f0;
-      padding-bottom: 0px;
-      margin-bottom: 1rem;
-    }
-
+    .action-row { display: flex; gap: 0.6rem; justify-content: flex-end; margin-top: 1rem; flex-wrap: wrap; align-items: center; }
+    .tabs-container { display: flex; gap: 0; border-bottom: 2px solid #e2e8f0; margin-bottom: 1rem; flex-wrap: wrap; }
     .tab-btn {
-      background: none;
-      border: none;
-      padding: 0.75rem 1.5rem;
-      font-family: 'Poppins', sans-serif;
-      font-weight: 600;
-      color: var(--text-muted);
-      cursor: pointer;
-      border-bottom: 3px solid transparent;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
+      background: none; border: none; padding: 0.75rem 1.25rem;
+      font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 0.9rem;
+      color: var(--text-muted); cursor: pointer;
+      border-bottom: 3px solid transparent; margin-bottom: -2px;
+      transition: all 0.2s; display: flex; align-items: center; gap: 6px;
     }
-
-    .tab-btn:hover {
-      color: var(--primary);
-      background-color: #f8fafc;
-    }
-
-    .tab-btn.active {
-      color: var(--primary);
-      border-bottom-color: var(--primary);
-    }
-
-    .tabs-actions {
-      margin-left: auto;
-      /* Push to right */
-      display: flex;
-      align-items: center;
-      padding-right: 1rem;
-    }
+    .tab-btn:hover { color: var(--primary); background: #f8fafc; }
+    .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+    .tabs-actions { margin-left: auto; display: flex; align-items: center; padding-right: 0.5rem; }
   </style>
-
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="firebase-config.js?v=2"></script>
-  <script src="viewquotes.js" defer></script>
 </head>
 
 <body>
@@ -190,8 +109,7 @@
           <button class="nav-item" onclick="window.location.href='dashboard.html'">
             <i data-lucide="layout-grid"></i> Dashboard
           </button>
-          <button class="nav-item" onclick="window.location.href='dashboard.html'">
-            <!-- Reuse logic? Or separate page? -->
+          <button class="nav-item" onclick="window.location.href='add-product.html'">
             <i data-lucide="plus-circle"></i> Add Product
           </button>
           <button class="nav-item" onclick="window.location.href='quote.html'">
@@ -217,9 +135,7 @@
       </nav>
 
       <div class="sidebar-footer">
-        <button class="nav-item">
-          <i data-lucide="user"></i> Profile
-        </button>
+        <!-- sidebar-user.js injects user badge -->
         <button id="logoutBtn" class="nav-item danger">
           <i data-lucide="log-out"></i> Logout
         </button>
@@ -234,22 +150,29 @@
           <i data-lucide="search"></i>
           <input type="text" id="quoteSearch" placeholder="Search customer name..." />
         </div>
+        <button class="btn btn-outline btn-sm" onclick="CommandPalette.open()" title="Ctrl+K" style="display:flex;align-items:center;gap:6px;margin-left:auto;">
+          <i data-lucide="terminal" style="width:15px;height:15px;"></i>
+          <span style="font-size:0.78rem;">⌘K</span>
+        </button>
       </header>
 
       <div class="content-wrapper">
 
         <div class="tabs-container">
           <button class="tab-btn active" data-tab="Pending">
-            <i data-lucide="clock" style="width:16px; margin-right:6px;"></i> Pending
+            <i data-lucide="clock" style="width:15px;"></i> Pending
           </button>
           <button class="tab-btn" data-tab="Accepted">
-            <i data-lucide="check-circle" style="width:16px; margin-right:6px;"></i> Accepted
+            <i data-lucide="check-circle" style="width:15px;"></i> Accepted
           </button>
           <button class="tab-btn" data-tab="Rejected">
-            <i data-lucide="x-circle" style="width:16px; margin-right:6px;"></i> Rejected
+            <i data-lucide="x-circle" style="width:15px;"></i> Rejected
+          </button>
+          <button class="tab-btn" data-tab="Expired">
+            <i data-lucide="clock" style="width:15px;"></i> Expired
           </button>
           <button class="tab-btn" data-tab="All">
-            <i data-lucide="list" style="width:16px; margin-right:6px;"></i> All Quotes
+            <i data-lucide="list" style="width:15px;"></i> All Quotes
           </button>
           <div class="tabs-actions">
             <button id="exportQuotesBtn" class="btn btn-outline btn-sm">
@@ -258,31 +181,22 @@
           </div>
         </div>
 
-        <div class="filter-bar" style="display:flex; gap:1rem; margin-bottom:1.5rem; justify-content: flex-end;">
+        <div class="filter-bar" style="display:flex; gap:1rem; margin-bottom:1.5rem; justify-content:flex-end;">
           <div style="display:flex; align-items:center; gap:0.5rem;">
-            <label for="quoteDateFilter" style="font-size:0.9rem; color:#64748b;">Filter Date:</label>
-            <input type="date" id="quoteDateFilter"
-              style="padding:0.5rem; border:1px solid #e2e8f0; border-radius:8px;" />
+            <label style="font-size:0.9rem; color:#64748b; margin:0;">Filter Date:</label>
+            <input type="date" id="quoteDateFilter" style="padding:0.5rem; border:1px solid #e2e8f0; border-radius:8px; font-family:inherit;" />
           </div>
         </div>
 
         <!-- Quotes List -->
-        <div id="quoteList" style="margin-top: 2rem;">
-          <!-- Populated by JS -->
-        </div>
+        <div id="quoteList"></div>
+
+      </div>
     </main>
   </div>
 
   <script>
     lucide.createIcons();
-
-    // Quick fix for logout since it might rely on dashboard.js logic
-    // We should ideally have a shared auth.js
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-      firebase.auth().signOut().then(() => {
-        window.location.href = 'index.html';
-      });
-    });
   </script>
 </body>
 

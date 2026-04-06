@@ -10,91 +10,39 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="dashboard.css?v=3" />
-
-  <style>
-    .split-view {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 2rem;
-    }
-
-    @media (max-width: 1024px) {
-      .split-view {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .form-section {
-      background: white;
-      padding: 1.5rem;
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border-color);
-      box-shadow: var(--shadow-md);
-    }
-
-    .form-header {
-      margin-bottom: 1.5rem;
-      border-bottom: 1px solid var(--border-color);
-      padding-bottom: 1rem;
-    }
-
-    .form-header h3 {
-      font-size: 1.2rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .cust-form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-      margin-bottom: 1rem;
-    }
-
-    .full-width {
-      grid-column: 1 / -1;
-    }
-
-    .product-selector-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1rem;
-    }
-
-    .product-selector-table th {
-      background: #f8fafc;
-      padding: 0.75rem;
-      text-align: left;
-    }
-
-    .product-selector-table td {
-      border-bottom: 1px solid var(--border-color);
-      padding: 0.75rem;
-    }
-
-    .product-selector-table tr:hover {
-      background: #f1f5f9;
-    }
-
-    .selected-count {
-      background: var(--primary);
-      color: white;
-      padding: 2px 8px;
-      border-radius: 10px;
-      font-size: 0.8rem;
-    }
-  </style>
+  <link rel="stylesheet" href="dashboard.css?v=4" />
+  <link rel="stylesheet" href="toast.css" />
+  <link rel="stylesheet" href="command-palette.css" />
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
   <script src="firebase-config.js?v=2"></script>
+
+  <!-- Shared -->
+  <script src="utils.js"></script>
+  <script src="toast.js"></script>
   <script src="quote.js" defer></script>
+  <script src="sidebar-user.js" defer></script>
+  <script src="command-palette.js" defer></script>
+
+  <style>
+    .split-view { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; }
+    @media (max-width: 1024px) { .split-view { grid-template-columns: 1fr; } }
+    .form-section {
+      background: white; padding: 1.5rem;
+      border-radius: var(--radius-lg); border: 1px solid var(--border-color); box-shadow: var(--shadow-md);
+    }
+    .form-header { margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; }
+    .form-header h3 { font-size: 1.1rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .cust-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+    .full-width { grid-column: 1 / -1; }
+    .product-selector-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    .product-selector-table th { background: #f8fafc; padding: 0.75rem; text-align: left; font-size: 0.82rem; text-transform: uppercase; color: var(--text-muted); }
+    .product-selector-table td { border-bottom: 1px solid var(--border-color); padding: 0.75rem; }
+    .product-selector-table tr:hover td { background: #f8fafc; }
+  </style>
 </head>
 
 <body>
@@ -113,7 +61,7 @@
           <button class="nav-item" onclick="window.location.href='dashboard.html'">
             <i data-lucide="layout-grid"></i> Dashboard
           </button>
-          <button class="nav-item" onclick="window.location.href='dashboard.html'">
+          <button class="nav-item" onclick="window.location.href='add-product.html'">
             <i data-lucide="plus-circle"></i> Add Product
           </button>
           <button class="nav-item active">
@@ -139,9 +87,7 @@
       </nav>
 
       <div class="sidebar-footer">
-        <button class="nav-item">
-          <i data-lucide="user"></i> Profile
-        </button>
+        <!-- sidebar-user.js injects user badge -->
         <button id="logoutBtn" class="nav-item danger">
           <i data-lucide="log-out"></i> Logout
         </button>
@@ -152,39 +98,38 @@
     <main class="main-content">
       <header class="top-bar">
         <h2 class="page-title">Create New Quote</h2>
+        <button class="btn btn-outline btn-sm" onclick="CommandPalette.open()" title="Ctrl+K" style="display:flex;align-items:center;gap:6px;margin-left:auto;">
+          <i data-lucide="terminal" style="width:15px;height:15px;"></i>
+          <span style="font-size:0.78rem;">⌘K</span>
+        </button>
       </header>
 
       <div class="content-wrapper">
-
         <div class="split-view">
           <!-- Left: Product Selection -->
           <div class="form-section">
             <div class="form-header">
-              <h3><i data-lucide="shopping-cart" style="color: var(--primary);"></i> Select Products</h3>
+              <h3><i data-lucide="shopping-cart" style="color:var(--primary);"></i> Select Products</h3>
             </div>
-            <input type="text" id="productSearch" placeholder="Search products..." style="margin-bottom: 1rem;">
-
-            <div style="max-height: 500px; overflow-y: auto;">
+            <input type="text" id="productSearch" placeholder="Search products..." style="margin-bottom:1rem;">
+            <div style="max-height:500px;overflow-y:auto;">
               <table id="productTable" class="product-selector-table">
                 <thead>
                   <tr>
                     <th width="40">Add</th>
                     <th>Product</th>
-                    <th>Category</th>
                     <th>Price</th>
+                    <th>Category</th>
                     <th>Stock</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <!-- Populated by JS -->
-                </tbody>
+                <tbody></tbody>
               </table>
             </div>
           </div>
 
           <!-- Right: Customer Info -->
           <div class="form-section">
-            <!-- Customer Information -->
             <div class="form-header">
               <h3><i data-lucide="user"></i> Customer Details</h3>
             </div>
@@ -192,23 +137,19 @@
             <form id="quoteForm">
               <div class="cust-form-grid">
                 <div class="full-width">
-                  <label>Select Customer <span style="font-weight:normal; color:#666; font-size:0.85rem;">(or type
-                      manual details below)</span></label>
-                  <div style="display: flex; gap: 0.5rem;">
-                    <select id="customerSelect"
-                      style="flex: 1; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: var(--radius-md);">
+                  <label>Select Customer <span style="font-weight:normal;color:#666;font-size:0.82rem;">(or type below)</span></label>
+                  <div style="display:flex;gap:0.5rem;">
+                    <select id="customerSelect" style="flex:1;">
                       <option value="">-- Choose a Customer --</option>
                     </select>
-                    <button type="button" id="refreshCustomersBtn" class="btn btn-outline" style="padding: 0.5rem;"
-                      title="Refresh List">
-                      <i data-lucide="refresh-cw" style="width: 16px; height: 16px;"></i>
+                    <button type="button" id="refreshCustomersBtn" class="btn btn-outline btn-sm" title="Refresh">
+                      <i data-lucide="refresh-cw" style="width:15px;height:15px;"></i>
                     </button>
                   </div>
                 </div>
-
                 <div>
                   <label for="cName">Client Name</label>
-                  <input type="text" id="cName" required placeholder="e.g. John Doe" />
+                  <input type="text" id="cName" required placeholder="John Doe" />
                 </div>
                 <div>
                   <label for="cEmail">Email Address</label>
@@ -224,25 +165,18 @@
                 </div>
               </div>
 
-              <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+              <button type="submit" class="btn btn-primary" style="width:100%;margin-top:1rem;">
                 <i data-lucide="save"></i> Save Quote
               </button>
             </form>
           </div>
         </div>
-
       </div>
     </main>
   </div>
 
   <script>
     lucide.createIcons();
-
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-      firebase.auth().signOut().then(() => {
-        window.location.href = 'index.html';
-      });
-    });
   </script>
 </body>
 

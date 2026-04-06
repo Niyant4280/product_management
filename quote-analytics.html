@@ -8,17 +8,23 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="dashboard.css" />
+  <link rel="stylesheet" href="toast.css" />
+  <link rel="stylesheet" href="command-palette.css" />
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="firebase-config.js?v=2"></script>
+  <script src="utils.js"></script>
+  <script src="toast.js"></script>
   <script src="quote-analytics.js" defer></script>
+  <script src="sidebar-user.js" defer></script>
+  <script src="command-palette.js" defer></script>
 
   <style>
     .analytics-grid {
@@ -161,9 +167,7 @@
       </nav>
 
       <div class="sidebar-footer">
-        <button class="nav-item">
-          <i data-lucide="user"></i> Profile
-        </button>
+        <!-- sidebar-user.js injects user badge -->
         <button id="logoutBtn" class="nav-item danger">
           <i data-lucide="log-out"></i> Logout
         </button>
@@ -188,33 +192,24 @@
           <!-- Status Distribution -->
           <div class="chart-card">
             <h3>Status Breakdown</h3>
-            <div class="chart-container" style="display: flex; justify-content: center; align-items: center;">
-              <img id="statusChartReq" src="" style="max-width: 100%; max-height: 100%;" alt="Status Breakdown Chart">
-            </div>
+            <div class="chart-container"><canvas id="statusChart"></canvas></div>
           </div>
 
           <!-- Revenue Trend -->
-          <div class="chart-card full-width" style="grid-column: 1 / -1;">
-            <h3>Revenue Trend</h3>
-            <div class="chart-container" style="display: flex; justify-content: center; align-items: center;">
-              <img id="revenueChartReq" src="" style="max-width: 100%; max-height: 400px;" alt="Revenue Trend Chart">
-            </div>
+          <div class="chart-card">
+            <h3>Revenue Trend (Last 6 Months)</h3>
+            <div class="chart-container"><canvas id="revenueChart"></canvas></div>
           </div>
 
-          <!-- Top Products -->
-          <div class="chart-card">
-            <h3>Top Selling Products</h3>
-            <div class="chart-container" style="display: flex; justify-content: center; align-items: center;">
-              <img id="topProductsChartReq" src="" style="max-width: 100%; max-height: 100%;" alt="Top Products Chart">
-            </div>
-          </div>
-
-          <!-- Recent Activity (Timeline or just List) -->
-          <div class="chart-card">
+          <!-- Recent Quotes -->
+          <div class="chart-card" style="grid-column:1/-1;">
             <h3>Recent Quotes</h3>
-            <div id="recentQuotesList" style="overflow-y: auto; max-height: 350px;"></div>
+            <div id="recentQuotesList" style="overflow-y:auto;max-height:350px;"></div>
           </div>
         </div>
+
+        <!-- ===== REVENUE FORECASTING PANEL (Feature #8) ===== -->
+        <div id="forecastPanel" style="margin-top:2rem;"></div>
 
       </div>
     </main>
@@ -222,12 +217,6 @@
 
   <script>
     lucide.createIcons();
-
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-      firebase.auth().signOut().then(() => {
-        window.location.href = 'index.html';
-      });
-    });
   </script>
 </body>
 

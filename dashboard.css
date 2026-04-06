@@ -485,3 +485,121 @@ tr:hover td {
   display: block;
   margin-top: 4px;
 }
+
+/* ===== Sidebar User Badge ===== */
+.sidebar-user-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-bottom: 0.5rem;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.04);
+}
+
+.sidebar-user-badge:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.sidebar-avatar-sm {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sidebar-user-info {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.sidebar-user-name {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #f1f5f9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-user-email {
+  display: block;
+  font-size: 0.72rem;
+  color: #94a3b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ===== Low-Stock Banner ===== */
+.low-stock-banner {
+  background: linear-gradient(135deg, #fff7ed, #fef3c7);
+  border: 1px solid #fde68a;
+  border-left: 4px solid #f59e0b;
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.low-stock-banner i { color: #d97706; width: 20px; height: 20px; flex-shrink: 0; margin-top: 2px; }
+
+.low-stock-banner-text { flex: 1; }
+.low-stock-banner-text strong { color: #92400e; font-size: 0.9rem; }
+.low-stock-banner-text p { color: #b45309; font-size: 0.82rem; margin: 4px 0 0; line-height: 1.5; }
+
+.low-stock-dismiss {
+  background: none;
+  border: none;
+  color: #92400e;
+  cursor: pointer;
+  padding: 0;
+  font-size: 1.1rem;
+  line-height: 1;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+  width: auto;
+  flex-shrink: 0;
+}
+.low-stock-dismiss:hover { opacity: 1; }
+
+/* ===== Revenue Chart Card ===== */
+.revenue-chart-card {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+}
+
+.revenue-chart-card .card-header {
+  padding: 0;
+  border: none;
+  margin-bottom: 1.25rem;
+}
+
+.revenue-chart-card .card-header h3 { font-size: 1.05rem; }
+
+.revenue-chart-wrap {
+  position: relative;
+  height: 220px;
+}
+
+/* ===== Stat Counter Animation ===== */
+.stat-value {
+  transition: color 0.3s;
+}
+
+.stat-value.counting { color: var(--primary); }
